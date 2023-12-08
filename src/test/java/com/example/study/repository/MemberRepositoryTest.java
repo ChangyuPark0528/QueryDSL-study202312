@@ -2,7 +2,6 @@ package com.example.study.repository;
 
 import com.example.study.entity.Member;
 import com.example.study.entity.QMember;
-import com.example.study.entity.Team;
 import com.querydsl.core.Tuple;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -360,6 +359,44 @@ class MemberRepositoryTest {
         System.out.println("\n\n\n");
         result.forEach(System.out::println);
         System.out.println("\n\n\n");
+
+    }
+
+    @Test
+    @DisplayName("나이가 평균 나이 이상인 회원을 조회")
+    void subQueryGoe() {
+        //given
+        QMember m2 = new QMember("m2");
+        //when
+        List<Member> result = factory.selectFrom(member)
+                .where(member.age.goe(
+                        // JPAExpressions은 from절을 제외하고, select와 where절에서 사용이 가능.
+                        // JPQL도 마찬가지로 from절 서브쿼리 사용 불가
+                        // -> Native SQL을 작성하던지, MyBatis or JDBCTemplate 이용, 따로따로 두 번 조회도 사용.
+                        JPAExpressions
+                                .select(m2.age.avg())
+                                .from(m2)
+                ))
+                .fetch();
+        //then
+        assertEquals(result.size(), 7);
+    }
+
+    @Test
+    @DisplayName("동적 sql 테스트")
+    void dynamicQueryTest() {
+        //given
+        String name = null;
+        int age = 30;
+        //when
+        List<Member> result = memberRepository.findUser(name, null);
+        //then
+        assertEquals(result.size(), 12);
+
+        System.out.println("\n\n\n");
+        result.forEach(System.out::println);
+        System.out.println("\n\n\n");
+
 
     }
 

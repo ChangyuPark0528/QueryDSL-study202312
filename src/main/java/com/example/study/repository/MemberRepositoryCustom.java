@@ -8,4 +8,6 @@ public interface MemberRepositoryCustom {
 
     List<Member> findByName(String name);
 
+    // WHERE절에 BooleanExpression을 리턴하는 메서드를 사용합니다.
+    List<Member> findUser(String nameParam, Integer ageParam);
 }
